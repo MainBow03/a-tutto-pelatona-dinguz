@@ -174,10 +174,11 @@ function rpsView(c){const r=c.rps;if(!r)return '<div class="notice">Si sta prepa
 const SURVIVAL_TYPES=new Set(['nascondino','gavettone','porte','castello','coccobomba']);
 function survivorName(s,id){return s.players.find(p=>p.id===id)?.char||'?'}
 function survivalAreaCount(c){return c.type==='nascondino'?Math.min(30,Math.max(8,c.survival.active.length*2)):c.type==='porte'?Math.max(4,c.survival.active.length):c.type==='castello'?3:4}
-function initSurvival(s){const c=s.challenge;c.deadline=now()+900000;c.survival={active:[...c.players],out:[],round:1,phase:'choose',starts:now(),until:now()+18000,choices:{},history:[],last:null,holder:c.type==='coccobomba'?choice(c.players):null,passes:0,passedAt:0};if(c.type==='coccobomba')c.survival.until=now()+rand(9500,15500)}
+function scheduleSurvivalBots(s,v){const bots=shuffle(v.active.filter(id=>!s.players.find(p=>p.id===id)?.human));const spacing=Math.min(1250,Math.max(230,11000/Math.max(1,bots.length)));v.botSchedule=Object.fromEntries(bots.map((id,i)=>[id,v.starts+1200+(i+1)*spacing+rand(-150,180)]))}
+function initSurvival(s){const c=s.challenge;c.deadline=now()+900000;c.survival={active:[...c.players],out:[],round:1,phase:'choose',starts:now(),until:now()+18000,choices:{},history:[],last:null,holder:c.type==='coccobomba'?choice(c.players):null,passes:0,passedAt:0};if(c.type==='coccobomba')c.survival.until=now()+rand(9500,15500);scheduleSurvivalBots(s,c.survival)}
 function chooseSurvivalZone(s,id,z){const c=s.challenge,v=c?.survival;if(!v||v.phase!=='choose'||!v.active.includes(id)||c.type==='coccobomba'||!Number.isInteger(z)||z<0||z>=survivalAreaCount(c))return false;if(['nascondino','porte'].includes(c.type)&&Object.entries(v.choices).some(([other,pos])=>other!==id&&pos===z))return false;v.choices[id]=z;return true}
 function surviveRound(s){const c=s.challenge,v=c.survival,t=now();
- if(v.phase==='reveal') {if(t<v.until)return false;if(v.finalizePending){Object.assign(c.scores,v.pendingScores||{});scoreResolve(s);return true}v.round++;v.phase='choose';v.starts=t;v.choices={};v.last=null;v.until=t+Math.max(13500,Math.min(29000,v.active.length*1450));if(c.type==='coccobomba'){v.holder=choice(v.active);v.passes=0;v.passedAt=0;v.until=t+rand(9000,15300)}return true}
+ if(v.phase==='reveal') {if(t<v.until)return false;if(v.finalizePending){Object.assign(c.scores,v.pendingScores||{});scoreResolve(s);return true}v.round++;v.phase='choose';v.starts=t;v.choices={};v.last=null;v.until=t+Math.max(13500,Math.min(29000,v.active.length*1450));if(c.type==='coccobomba'){v.holder=choice(v.active);v.passes=0;v.passedAt=0;v.until=t+rand(9000,15300)}scheduleSurvivalBots(s,v);return true}
  if(v.phase==='search'){if(t<v.searchAt)return false;if(v.searchIndex<v.searchPath.length-1){v.searchIndex++;v.searchAt=t+1850;return true}v.phase='resolve';v.searchIndex=v.searchPath.length;v.until=t;}
  if(c.type==='coccobomba'){
   const holder=s.players.find(p=>p.id===v.holder);
@@ -186,7 +187,7 @@ function surviveRound(s){const c=s.challenge,v=c.survival,t=now();
   const eliminated=v.holder;v.active=v.active.filter(id=>id!==eliminated);v.out.push(eliminated);v.last={bad:-1,removed:[eliminated],note:`💥 La Cocco-Bomba esplode! ${survivorName(s,eliminated)} è fuori.`};v.history.push(v.last.note);c.logs.push(v.last.note);
  }else{
   const waiting=v.active.filter(id=>v.choices[id]===undefined);let picksChanged=false;
-  for(const id of waiting){const bot=s.players.find(p=>p.id===id);if(bot&&!bot.human&&t-v.starts>750+Math.floor(Math.random()*2500)){
+  for(const id of waiting){const bot=s.players.find(p=>p.id===id);if(bot&&!bot.human&&t>=(v.botSchedule?.[id]||v.starts+rand(950,2400))){
    const occupied=Object.values(v.choices),choices=Array.from({length:survivalAreaCount(c)},(_,i)=>i).filter(i=>!['porte','nascondino'].includes(c.type)||!occupied.includes(i));if(choices.length){v.choices[id]=choice(choices);picksChanged=true;}
   }}
   if(t<v.until&&v.active.some(id=>v.choices[id]===undefined))return picksChanged;

@@ -339,6 +339,30 @@ function stepScoringBots(s){const c=s.challenge;if(!c||!SCORE_GAMES.has(c.type))
   if(done<needed&&elapsed>=(done+1)*1000){castDice(s,id,rand(1,12));changed=true}
   continue;
  }
+ // Live bot moves: each NPC acts during the same match as human players.
+ if(c.type==='memory'){
+  const t=now(),a=c.actions[id]||{pairs:0,attempts:0,progress:0};
+  if(!plan.nextAt)plan.nextAt=c.startAt+rand(1200,3500);
+  if(t>=plan.nextAt){a.attempts++;
+   const skill=(p.skill||60)/100,knowledge=Math.min(.20,a.attempts*.006);
+   if(Math.random()<clamp(.18+skill*.56+knowledge,.20,.94))a.pairs=Math.min(16,a.pairs+1);
+   a.progress=Math.round(a.pairs/16*100);c.actions[id]=a;plan.progress=a.progress;
+   plan.nextAt=t+rand(1000,2700)+Math.round((1-skill)*650);changed=true;
+   if(a.pairs===16){c.scores[id]=125+Math.round(Math.max(0,c.deadline-t)/5000);plan.ended=true;}
+  }continue;
+ }
+ if(c.type==='cocco'){
+  const t=now(),a=c.actions[id]||{points:0,fruitCaught:0,misses:0};
+  if(!plan.nextAt)plan.nextAt=c.startAt+rand(600,1600);
+  if(t>=plan.nextAt){const skill=(p.skill||60)/100;
+   if(Math.random()<.54+skill*.42){a.points+=rand(1,Math.round(4+skill*4));a.fruitCaught++;}
+   else {a.misses++;if(Math.random()<.17)a.points=Math.max(0,a.points-3);}
+   c.actions[id]={...a,progress:Math.min(100,Math.round(elapsed/limit*100))};plan.progress=c.actions[id].progress;
+   plan.nextAt=t+rand(650,1450);changed=true;
+  }
+  if(t>=c.deadline-300){c.scores[id]=Math.max(0,a.points);plan.ended=true;changed=true;}
+  continue;
+ }
  if(c.type==='pesca'){
   let a=c.actions[id]||{fishes:0,fishScore:0,history:[]},count=isMerge(s)?4:3;
   if(a.fishes<count&&elapsed>(a.fishes+1)*plan.duration/count){let zone=rand(0,4),loot=catchFish(zone);a.fishes++;a.fishScore+=loot[1];a.history.push(loot[0]);a.last=loot[0];a.zone=zone;c.actions[id]=a;if(a.fishes===count)c.scores[id]=Math.max(0,a.fishScore);changed=true}continue;
@@ -362,9 +386,9 @@ function stepScoringBots(s){const c=s.challenge;if(!c||!SCORE_GAMES.has(c.type))
 }
 
 function botPerformance(type,p,elapsed=1){let skill=(p.skill||65)/100;if(type==='cocco')return Math.floor(63+skill*70+rand(-9,9));if(type==='dinguz')return Math.round(2000-1550*skill+rand(-130,270));if(type==='puzzle')return Math.floor(30+skill*62+rand(-8,8));if(type==='pesca')return Math.floor(1+skill*10+rand(-3,3));if(type==='mangiate')return Math.floor(62+skill*150+rand(-12,12));if(type==='ostacoli')return Math.floor(60+skill*205+rand(-18,18));if(type==='memory')return Math.floor(15+skill*74+rand(-8,8));if(type==='magma')return Math.floor(10+skill*11+rand(-4,2));if(type==='duelli')return Math.floor(35+skill*40+rand(-10,10));if(type==='nascondino'||type==='gavettone'||type==='porte'||type==='castello'||type==='coccobomba')return Math.floor(12+skill*80+rand(-15,15));return Math.floor(18+skill*83+rand(-16,16))}
-function scoreResolve(s){const ch=s.challenge,type=ch.type;const players=ch.players.map(id=>s.players.find(p=>p.id===id)).filter(Boolean),scores={};players.forEach(p=>{let score=ch.scores[p.id];if(score===undefined){score=p.human?0:botPerformance(type,p);if(type==='duelli'){score=ch.hp[p.id]===undefined?0:ch.hp[p.id]}if(type==='dadi'){score=ch.dice?.totals[p.id]||0}if(['puzzle','memory','mangiate'].includes(type)&&ch.botPlans?.[p.id])score=Math.max(0,Math.round(ch.botPlans[p.id].progress||0)) }scores[p.id]=Math.max(0,num(score))});
+function scoreResolve(s){const ch=s.challenge,type=ch.type;const players=ch.players.map(id=>s.players.find(p=>p.id===id)).filter(Boolean),scores={};players.forEach(p=>{let score=ch.scores[p.id];if(score===undefined){score=p.human?0:botPerformance(type,p);if(type==='cocco')score=ch.actions[p.id]?.points||0;if(type==='duelli'){score=ch.hp[p.id]===undefined?0:ch.hp[p.id]}if(type==='dadi'){score=ch.dice?.totals[p.id]||0}if(['puzzle','memory','mangiate'].includes(type)&&ch.botPlans?.[p.id])score=type==='memory'?(ch.actions[p.id]?.pairs||0)*6:Math.max(0,Math.round(ch.botPlans[p.id].progress||0)) }scores[p.id]=Math.max(0,num(score))});
  // A skillful CPU is guaranteed to be capable of scoring over 100, but human scores are never rewritten.
- if(type==='cocco'){let bots=players.filter(p=>!p.human);if(bots.length&&Math.max(...bots.map(p=>scores[p.id]))<100){let best=bots.sort((a,b)=>b.skill-a.skill)[0];scores[best.id]=Math.max(102,scores[best.id])}}
+ if(type==='cocco'){/* Bot totals are earned during play; no artificial last-second score replacement. */}
  let ordered=players.sort((a,b)=>type==='dinguz'&&!ch.dinguz?scores[a.id]-scores[b.id]:scores[b.id]-scores[a.id]);const group=!isMerge(s);let loser=null,winner=null,teamScores=[];
  if(group){for(let t=0;t<s.config.teams;t++){let groupPlayers=players.filter(p=>p.team===t);if(!groupPlayers.length)continue;let v=['puzzle','memory'].includes(type)?groupPlayers.reduce((sum,p)=>sum+Math.max(1,players.length-ordered.indexOf(p)),0):type==='dadi'?groupPlayers.reduce((sum,p)=>sum+scores[p.id],0):groupPlayers.reduce((sum,p)=>sum+scores[p.id],0)/groupPlayers.length;teamScores.push({team:t,score:Math.round(v*10)/10})}teamScores.sort((a,b)=>a.score-b.score);loser=type==='dinguz'&&!ch.dinguz?teamScores[teamScores.length-1]?.team??0:teamScores[0]?.team??0;winner=type==='dinguz'&&!ch.dinguz?teamScores[0]?.team??0:teamScores[teamScores.length-1]?.team??0}else{winner=ordered[0]?.id;loser=ordered[ordered.length-1]?.id}
  let tied=group?teamScores.length>1&&(type==='dinguz'?teamScores.at(-1).score===teamScores.at(-2).score:teamScores[0].score===teamScores[1].score):ordered.length>1&&(type==='magma'?scores[ordered.at(-1).id]===scores[ordered.at(-2).id]:scores[ordered[0].id]===scores[ordered[1].id]);
@@ -413,7 +437,7 @@ function liveScoreValue(c,p){
  const act=c.actions[p.id]||{},plan=c.botPlans?.[p.id];
  if(c.type==='memory'){if(p.id===uid)return mini.memory?.matches||act.pairs||0;if(c.scores[p.id]!==undefined)return 16;return Math.max(0,act.pairs??Math.floor((plan?.progress||0)/100*16));}
  if(c.scores[p.id]!==undefined&&c.type!=='ostacoli')return c.type==='puzzle'?(c.scores[p.id]>=125?100:clamp(c.scores[p.id],0,100)):c.scores[p.id];
- if(c.type==='cocco')return p.id===uid?mini.cocoScore:Math.max(0,Math.round((plan?.score||0)*(plan?.progress||0)/100));
+ if(c.type==='cocco')return p.id===uid?mini.cocoScore:Math.max(0,act.points||0);
  if(c.type==='pesca')return act.fishScore||0;
  if(c.type==='puzzle')return p.id===uid?Math.round((mini.puzzle?.score||0)*2):Math.max(0,plan?.progress||0);
  if(c.type==='ostacoli')return p.id===uid?Math.round(mini.runner?.progress||0):c.scores[p.id]!==undefined?100:clamp(Math.round(Math.max(0,now()-c.startAt)/(plan?.duration||45000)*100),0,100);

@@ -130,3 +130,68 @@ body:before{background:linear-gradient(96deg,#f8e9dadd 0%,#fbe2c7c8 47%,#f8dec28
 .memory-game{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(230px,.9fr);gap:17px;align-items:start}.memory-main{border-radius:19px;background:linear-gradient(180deg,#fff0cc,#fffaf0);padding:18px;box-shadow:inset 0 0 0 2px #ffe0a7}.memory-heading{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.memory-heading h2{margin:0;font-size:clamp(21px,2.5vw,29px)}.memory-heading p{color:#8a644f;margin:6px 0 14px;font-size:13px}.memory-progress-track{height:12px;width:100%;border-radius:20px;background:#ead3b5;overflow:hidden;margin:8px 0 14px}.memory-progress-track i{display:block;height:100%;width:0;background:linear-gradient(90deg,#47c788,#9ee28b);transition:width .25s}.memory-cards{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:clamp(3px,.75vw,8px);max-width:760px;margin:auto}.memory-card{position:relative;aspect-ratio: .82;border-radius:clamp(7px,1.1vw,13px);border:3px solid #fff1dc;box-shadow:0 3px 0 #b78170;cursor:pointer;background:radial-gradient(circle at 30% 24%,#ffbb7c,#fb7462);transition:background .13s,transform .13s;touch-action:manipulation;display:grid;place-items:center;padding:0}.memory-card .memory-back{font:900 clamp(19px,3vw,35px) Fredoka,Arial;color:#fff3d6;text-shadow:0 2px #bd533f}.memory-card .memory-front{display:none;font-size:clamp(18px,2.6vw,30px)}.memory-card.flipped{background:#fff9df;border-color:#f4b36c;transform:translateY(-2px)}.memory-card.flipped .memory-back{display:none}.memory-card.flipped .memory-front{display:block}.memory-card.matched{background:#e2f8db;border-color:#79cc86;box-shadow:0 3px 0 #7eb783;opacity:.82;cursor:default}.memory-leaderboard{position:sticky;top:57px;min-height:200px;border:2px solid #f4d9b4;background:#fffcf5}.memory-leaderboard h3{margin:0}.memory-leaderboard p{font-size:12px;color:#936f50;margin:8px 0}.memory-leaderboard .live-rank-row{min-height:45px;animation:none}.live-result-list .live-rank-row{animation:none!important;transition:background .18s,border-color .18s}.live-rank-track i{transition:width .35s ease-out}.magma-player.magma-out{filter:grayscale(1);opacity:.46}.magma-player.at-risk{box-shadow:0 0 0 3px #f6814f}.magma-controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:15px}
 @media(max-width:960px){.memory-game{grid-template-columns:1fr}.memory-leaderboard{position:static}.rope-contestants{grid-template-columns:repeat(auto-fit,minmax(136px,1fr))}}
 @media(max-width:580px){.memory-main{padding:10px}.memory-cards{gap:3px}.memory-card{border-width:2px;border-radius:6px}.memory-card .memory-front{font-size:17px}.memory-card .memory-back{font-size:23px}.rope-meter{height:72px}.rope-needle{height:90px}}
+
+/* 2026-11-06: Minigames polish, precise drag and beach broadcast race */
+.puzzlewrap{display:grid;grid-template-columns:minmax(205px,36%) minmax(0,1fr);gap:20px;align-items:start}
+.puzzlewrap>div{min-width:0}
+.puzzle-source{display:flex;gap:10px;align-items:center;margin:8px 0 14px;padding:10px;background:linear-gradient(100deg,#fff0d1,#fdfaf2);border:1px solid #efca87;border-radius:14px;color:#775036;font-size:12px;font-weight:900}
+.puzzle-source img{display:block;width:86px;height:86px;border-radius:10px;object-fit:cover;box-shadow:0 4px 10px #66401a2c;border:3px solid #fff}
+.puzzlewrap .pieces{display:grid;grid-template-columns:repeat(3,minmax(0,82px));gap:9px;align-content:start;max-height:430px;overflow-y:auto;overflow-x:hidden;padding:8px;background:#f5ecdb;border-radius:16px;border:2px solid #e8d6bd}
+.puzzlewrap .piece{display:block;aspect-ratio:1/1;width:100%;height:auto;min-height:52px;max-height:82px;border:3px solid white;box-shadow:0 2px 0 #cbaa80,0 3px 8px #8e734936;background-color:#ead6bb;background-repeat:no-repeat;object-fit:cover;touch-action:none;cursor:grab;border-radius:9px;box-sizing:border-box}
+.puzzlewrap .piece.selected{outline:3px solid #f9ab22;outline-offset:1px;border-color:#fff2ac;transform:translateY(-3px)}
+.puzzlewrap .puzzle-grid{width:min(510px,100%);max-width:100%;aspect-ratio:1/1;min-height:260px;gap:3px;padding:5px;background:#c6a287;touch-action:none}
+.puzzlewrap .puzzle-grid .cell{min-width:0;min-height:0;width:100%;height:100%;padding:0;border-radius:5px;border:1px solid #ddc8b8;touch-action:none;cursor:crosshair;background-color:#fff7ee;background-repeat:no-repeat;background-origin:border-box}
+.puzzlewrap .puzzle-grid .cell:hover{outline:3px solid #f6bf62;z-index:1}
+.puzzlewrap .puzzle-grid .cell.good{box-shadow:inset 0 0 0 3px #5acb88}
+.puzzlewrap .puzzle-grid .cell.wrong{box-shadow:inset 0 0 0 3px #ff936a}
+
+.food-warning{display:inline-block;padding:10px 17px;margin:12px auto;background:#dcf6d5;border-radius:14px;color:#266343;font-weight:900}
+.food.spicy{background:#ffd6d1;border:4px solid #f66057;border-radius:22px;animation:food-danger-pulse .4s ease-in-out infinite alternate}
+.eat-button{min-width:220px;min-height:68px;touch-action:manipulation;user-select:none;-webkit-tap-highlight-color:transparent}
+.eat-button.danger{background:linear-gradient(135deg,#fd544e,#e12d37);box-shadow:0 5px 0 #bb3033}
+@keyframes food-danger-pulse{from{filter:saturate(1)}to{filter:saturate(1.4) brightness(1.08)}}
+
+.island-map{flex-direction:column;background:linear-gradient(#a1dded,#76bccc);border:7px solid #e6fbff;border-radius:20px;gap:8px;min-height:600px;overflow-x:auto;overflow-y:hidden;padding:9px 0 15px}
+.island-map .island-spots{width:940px;max-width:none;min-height:525px;position:relative;flex-shrink:0}
+.island-map .island-instructions{font-weight:900;font-size:14px;z-index:2;position:relative}
+.island-search-banner{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;z-index:6;position:relative;background:#fffcf6;border:2px solid #f2a85f;box-shadow:0 5px 17px #7b472b55;padding:7px 17px;border-radius:12px;animation:island-search-in .35s}
+.island-search-banner span{font-size:26px}.island-search-banner b{font-size:17px;color:#874e29}.island-search-banner small{font-size:12px;color:#92715c}
+@keyframes island-search-in{from{transform:translateY(-7px);opacity:0}to{transform:translateY(0);opacity:1}}
+.stage-spot.hide-marker{min-height:72px;width:113px;box-shadow:0 6px 0 #2f6e567d,0 7px 16px #2f6e563e;border-radius:16px;transition:transform .2s,background .2s;overflow:visible}
+.stage-spot.hide-marker .hide-icon{font-size:30px;line-height:1.2}
+.stage-spot.hide-marker .hide-name{font-size:10px;font-weight:900;color:#456735}
+.stage-spot.hide-marker .spot-owner{margin:2px auto 0;font-weight:1000;background:#3c657a;color:#fff;border-radius:8px;font-size:10px;box-shadow:0 2px 0 #214151}
+.stage-spot.hide-marker.chosen .spot-owner{background:#2d9b64}
+.stage-spot.hide-marker:disabled:not(.chosen){filter:none;opacity:1;background:#eee8e0}
+.stage-spot.hide-marker .hide-scanning{position:absolute;top:-28px;right:2px;font-size:32px;animation:search-beam .6s ease-in-out infinite alternate;filter:drop-shadow(0 0 5px #fff4a1);z-index:8}
+@keyframes search-beam{from{transform:rotate(-18deg)}to{transform:rotate(16deg) scale(1.15)}}
+
+/* Broadcast layout for the obstacle race: seven small competitors + one large playable hero. */
+.race-broadcast{display:flex;flex-direction:column;gap:10px;min-width:0}
+.challenge-container:has(.race-broadcast){padding:clamp(10px,2vw,19px);background:#fff8e9}
+.race-studio-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-radius:17px;background:linear-gradient(110deg,#fff2ca,#f7d1a1);padding:14px}
+.race-studio-head h2{font-size:clamp(18px,2.2vw,25px);color:#774225;margin:0}
+.race-signal{font-weight:900;color:#935b3a;font-size:12px;background:#fff6db;border-radius:12px;padding:7px 11px}
+.race-other-header{font:900 12px Fredoka,Arial;letter-spacing:.05em;color:#93633b;margin:4px 0 0}
+.race-opponents{background:#fffdf5;border:2px solid #f4dabb;border-radius:18px;padding:8px;display:flex;flex-direction:column;gap:4px}
+.race-small-lane{display:grid;grid-template-columns:32px minmax(60px,105px) minmax(0,1fr) 45px;align-items:center;gap:9px;padding:3px 8px;min-height:39px;border-radius:9px;background:color-mix(in srgb,var(--race-team),white 82%);border-left:5px solid var(--race-team)}
+.race-small-lane>img{width:28px;height:29px;border-radius:7px;object-fit:cover;border:1px solid white}
+.race-small-lane>b{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#55402d}
+.race-small-track{height:23px;background:repeating-linear-gradient(100deg,#f8e4bb 0 55px,#efd19b 55px 56px);border-radius:11px;position:relative;overflow:hidden;border:1px solid #dbc49a}
+.race-small-progress{height:100%;width:0%;background:color-mix(in srgb,var(--race-team),transparent 54%);transition:width .25s linear}
+.race-small-runner{position:absolute;left:0%;top:50%;transform:translate(-10%,-50%);transition:left .2s linear;display:flex;align-items:center}
+.race-small-runner img{width:23px;height:23px;object-fit:cover;border:2px solid white;border-radius:50%;box-shadow:0 1px 4px #72553577}
+.race-small-finish{position:absolute;right:2px;top:-1px;font-size:19px}
+.race-small-percent{font:900 12px Fredoka,Arial;color:#764b2b;text-align:right}
+.race-hero-title{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#ffe8a8;padding:12px 15px;border-radius:15px}
+.race-hero-title>div{display:flex;flex-direction:column;gap:3px}
+.race-hero-title b{font-size:20px;color:#7a3b1c}
+.race-hero-title span{font-size:12px;color:#875d36;font-weight:700}
+.race-hero-title strong{font:900 28px Fredoka,Arial;color:#b45125;white-space:nowrap}
+.race-beach-wrap{position:relative;overflow:hidden;border:5px solid #fff1bf;border-radius:22px;background:#8de1f1;box-shadow:0 7px 19px #3c789b42}
+.race-hero-canvas{width:100%;height:auto;min-width:0;display:block;touch-action:manipulation;cursor:pointer}
+.race-touch-hint{position:absolute;right:10px;bottom:10px;background:#fff5dbd9;color:#8d5c35;font-size:11px;font-weight:900;border-radius:9px;padding:5px 8px;pointer-events:none}
+.race-bottom-rank{background:#fff7e8;border:1px solid #f5d3ae;border-radius:16px;padding:11px}
+.race-bottom-rank .live-result-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:5px}
+.race-bottom-rank .live-rank-row{min-width:0;padding:5px;font-size:11px}
+@media(max-width:700px){.puzzlewrap{grid-template-columns:minmax(120px,.9fr) minmax(0,1.45fr);gap:8px}.puzzle-source{flex-direction:column;align-items:flex-start;padding:6px}.puzzle-source img{height:64px;width:64px}.puzzlewrap .pieces{grid-template-columns:repeat(2,minmax(0,76px));gap:5px;padding:5px}.puzzlewrap .piece{min-height:45px}.puzzlewrap .puzzle-grid{min-height:0}.race-small-lane{grid-template-columns:26px minmax(50px,75px) minmax(0,1fr) 32px;gap:4px;padding:2px}.race-small-lane>b{font-size:10px}.race-hero-title b{font-size:17px}.race-small-lane>img{width:24px;height:24px}.island-map{min-height:600px}}

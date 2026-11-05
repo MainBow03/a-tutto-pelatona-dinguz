@@ -21,3 +21,16 @@
 ## Collaudi e limiti
 
 Sono stati eseguiti test headless di avvio e completamento delle sfide in entrambe le modalità in Chrome, e controlli sintattici JavaScript. I bot di alcuni giochi di velocità/abilità sono **simulati in base a skill e tempo**, non usano la stessa interfaccia manuale degli umani. La sincronizzazione Firestore con più browser su reti diverse non è stata ancora verificata. Alcuni casi limite (soprattutto 50 giocatori e abbandoni/riconnessioni) richiedono ulteriori test reali.
+
+## 5 novembre 2026 — Aggiornamento v3: prove interattive e classifiche live
+
+- **Tutti i minigiochi:** conto alla rovescia di 3 secondi; barra superiore con PNG dei partecipanti ancora in prova e concorrenti eliminati in grigio.
+- **Raccogli il Cocco:** classifica unica in diretta con posizioni e punteggi che cambiano durante la partita, non una classifica segreta di bravura.
+- **Dinguz Dice:** dopo il conto alla rovescia il conduttore aspetta prima di mostrare l'emoji; tempi di reazione in secondi con tre decimali.
+- **Puzzle:** inserimento/rimozione dei pezzi, trascinamento con mouse o dito, pezzi assenti dal vassoio quando già posizionati; progressi percentuali visibili.
+- **Pesca:** classifica a sinistra e pannelli di squadra; turni a round con 4 round individuali simultanei oppure 3 round consecutivi per membro di ogni squadra.
+- **Nascondino:** mappa tropicale illustrata, più leggibile e con segnali dei nascondigli posizionati sull'isola.
+- **Gara di Mangiate:** conteggio più reattivo dei clic con animazione, senza il precedente limite di 90 ms.
+- **Corsa a Ostacoli:** otto corsie visibili, avatar PNG che ruotano avanzando verso il traguardo, ostacoli, salto, penalità di rallentamento ma nessuna vita. In Prova libera individuale, le due corsie aggiuntive sono ospiti non in classifica.
+
+**Verifiche:** test di avvio in entrambe le modalità, completamento simulato di Pesca, Dinguz Dice e Nascondino, test di Puzzle/Pane e sintassi JavaScript. La sincronizzazione Firestore multi-dispositivo resta da collaudare.

@@ -195,3 +195,21 @@ body:before{background:linear-gradient(96deg,#f8e9dadd 0%,#fbe2c7c8 47%,#f8dec28
 .race-bottom-rank .live-result-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:5px}
 .race-bottom-rank .live-rank-row{min-width:0;padding:5px;font-size:11px}
 @media(max-width:700px){.puzzlewrap{grid-template-columns:minmax(120px,.9fr) minmax(0,1.45fr);gap:8px}.puzzle-source{flex-direction:column;align-items:flex-start;padding:6px}.puzzle-source img{height:64px;width:64px}.puzzlewrap .pieces{grid-template-columns:repeat(2,minmax(0,76px));gap:5px;padding:5px}.puzzlewrap .piece{min-height:45px}.puzzlewrap .puzzle-grid{min-height:0}.race-small-lane{grid-template-columns:26px minmax(50px,75px) minmax(0,1fr) 32px;gap:4px;padding:2px}.race-small-lane>b{font-size:10px}.race-hero-title b{font-size:17px}.race-small-lane>img{width:24px;height:24px}.island-map{min-height:600px}}
+/* 2026-11-06 — Corsa a ostacoli compatta, salto reattivo e velocità crescente. */
+.race-compact{display:flex;flex-direction:column;gap:8px;min-width:0}
+.race-compact-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-radius:12px;background:#fff0cb;padding:8px 12px;color:#754729;font-size:13px;font-weight:900}
+.race-compact-head strong{font:900 20px Fredoka,Arial;color:#df6325}
+.race-compact-head b{background:#ffdb76;border-radius:8px;padding:5px 9px}
+.race-compact-track{width:100%;border:3px solid #ffe4aa;border-radius:15px;overflow:hidden;background:#a0e4f3;box-shadow:0 3px 9px #6f60302c}
+.race-compact .race-compact-canvas{display:block;width:100%;height:auto;max-height:none;min-width:0;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.race-compact-controls{display:flex;align-items:center;flex-wrap:wrap;gap:9px;background:#fff5dc;border-radius:13px;padding:7px 9px}
+.race-compact-controls #raceAlert{flex:1;color:#8c542d;min-width:145px;font-size:14px}
+.race-compact-controls span{color:#907259;font-size:11px;font-weight:800}
+.race-jump-btn{font-size:17px;min-width:130px;min-height:48px;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.race-compact-ranks{background:#fffaf0;border:1px solid #f7dbb8;border-radius:14px;padding:9px}
+.race-compact-ranks>b{display:block;margin-bottom:7px;font:900 14px Fredoka,Arial;color:#7c4827}
+.race-compact-ranks .live-result-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:5px}
+.race-compact-ranks .live-rank-row{min-width:0;min-height:38px;padding:4px;font-size:11px}
+.race-compact-ranks .live-rank-row img{height:29px;width:29px}
+.race-compact-ranks .live-rank-data b{font-size:11px}
+@media(max-width:700px){.race-compact-head{gap:6px;font-size:11px;padding:7px}.race-compact-head strong{font-size:16px}.race-compact-controls{justify-content:center}.race-compact-controls span{text-align:center;width:100%}.race-jump-btn{flex:0 0 52%;min-height:56px}.race-compact-ranks .live-result-list{grid-template-columns:repeat(2,minmax(0,1fr))}}

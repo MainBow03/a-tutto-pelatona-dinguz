@@ -481,13 +481,12 @@ function gameContent(c,g,me,left){const action=c.actions[uid]||{};if(SURVIVAL_TY
 
  case 'puzzle':return `<div class="puzzlewrap"><div><h4>🧩 Pezzi mescolati</h4><p class="muted">Trascina un pezzo oppure selezionalo e tocca una casella. Toccane uno inserito per ritirarlo.</p><div class="puzzle-source"><img id="puzzleSource" src="" alt="Immagine di riferimento completa"><span>Immagine da ricostruire</span></div><div id="pieces" class="pieces"></div></div><div style="min-width:0"><div class="flex between"><h3 id="puzzleStage">Stage 1/3 · 3×3</h3><span class="clock">⏱ ${left}s</span></div><div class="puzzle-progress"><b id="puzzlePercent">0%</b><div class="puzzle-progress-bar"><i id="puzzleProgressFill" style="width:0%"></i></div></div><div class="puzzle-grid" id="puzzleGrid"></div><p id="puzzleInfo" class="muted">Scegli un pezzo, poi tocca la sua casella.</p></div></div>`;
  case 'mangiate':{let progress=Math.min(mini.food,205),kind=progress<50?'🍞 Pane':progress<125?'🍝 Spaghetti':'🥞 Pancake',stage=progress<50?progress:progress<125?progress-50:progress-125,total=progress<50?50:progress<125?75:80;return `<div class="resultpanel"><h2 id="foodname">${kind}</h2><div id="foodIcon" class="food">${kind.split(' ')[0]}</div><div class="timerbar"><div id="foodbar" style="width:${(progress/205)*100}%"></div></div><p>Totale: <strong id="foodpoints">${progress}/205</strong> · Porzione: <b id="foodstage">${stage}/${total}</b></p><button id="foodClick" class="btn primary bigbutton eat-button" data-act="eat">🍴 MANGIA!</button><p id="foodWarning" class="food-warning">🟢 VIA! Clicca velocemente per mangiare.</p></div>`}
- case 'ostacoli':return `<div class="race-broadcast">
- <div class="race-studio-head"><div><span class="eyebrow">🏝️ GARA SULLA SPIAGGIA DI DINGUZ</span><h2>🏁 Prima il traguardo, poi il marshmallow!</h2></div><span class="race-signal">Salta con SPAZIO o tocca la spiaggia</span></div>
- <div class="race-other-header">🏃 GLI ALTRI CONCORRENTI · CORSIE IN DIRETTA</div>
- <div class="race-opponents" id="raceOpponents">${c.players.filter(id=>id!==uid).slice(0,7).map(id=>{let p=playerBy(id);return `<div class="race-small-lane" data-racer="${esc(id)}" style="--race-team:${TEAMS[p?.team]?.color||'#ffb24b'}"><img src="${esc(avatarImg(p))}" alt=""><b>${esc(p?.char||'')}</b><div class="race-small-track"><div class="race-small-progress"></div><span class="race-small-runner"><img src="${esc(avatarImg(p))}" alt=""></span><span class="race-small-finish">🏁</span></div><span class="race-small-percent">0%</span></div>`}).join('')}</div>
- <div class="race-hero-title"><div><b>⭐ LA TUA CORSA</b><span>Salta i tronchi, le conchiglie e le casse prima di raggiungere l'arrivo.</span></div><strong id="runnerScore">${Math.round(mini.runner?.progress||0)}%</strong></div>
- <div class="race-beach-wrap"><canvas class="runner-canvas race-hero-canvas" id="runnerCanvas" width="1100" height="430" aria-label="Percorso sulla spiaggia: tocca per saltare"></canvas><div class="race-touch-hint">👆 Tocca qui per saltare</div></div>
- <div class="race-footer"><b>🏁 Nessuna vita: gli ostacoli ti rallentano, ma non ti eliminano.</b><span>Il tuo personaggio è quello grande, sulla spiaggia!</span></div><div class="race-bottom-rank"><h4>🏆 Posizioni in tempo reale</h4><div id="live-rank" class="live-result-list"></div></div></div>`;
+ case 'ostacoli':return `<div class="race-compact">
+ <div class="race-compact-head"><span>🏝️ Corsa sulla spiaggia · ${c.players.length} concorrenti</span><strong id="runnerScore">${Math.round(mini.runner?.progress||0)}%</strong><span id="raceDistance">0 / 3000 m</span><b id="raceSpeed">53 km/h</b></div>
+ <div class="race-compact-track"><canvas class="runner-canvas race-compact-canvas" id="runnerCanvas" width="1024" height="355" aria-label="Corsa a ostacoli: tocca per saltare" tabindex="0"></canvas></div>
+ <div class="race-compact-controls"><button id="raceJump" type="button" class="btn primary race-jump-btn">⬆ SALTA!</button><b id="raceAlert" aria-live="off">Pronto per la partenza!</b><span>SPAZIO / ↑ / W oppure tocca la pista · Ogni ostacolo rallenta, nessuna vita</span></div>
+ <div class="race-compact-ranks"><b>🏆 Posizioni in diretta</b><div id="live-rank" class="live-result-list"></div></div>
+ </div>`;
 
  case 'nascondino':{let others=c.players.map(playerBy).filter(p=>p&&p.id!==uid);let occupied=Object.entries(c.actions).map(([id,a])=>a.zone).filter(x=>x!==undefined);return `<div><h3>🏝️ L’isola di Dinguz</h3><p class="muted">Ogni giocatore può scegliere un solo nascondiglio; i posti già occupati non sono disponibili.</p><div class="island">${HIDE_SPOTS.slice(0,Math.max(8,Math.min(30,c.players.length*2))).map((z,i)=>`<button class="zone ${action.zone===i?'selected':''}" data-act="minipick" data-value="hide_${i}" ${occupied.includes(i)&&action.zone!==i?'disabled':''}>${esc(z)} ${occupied.includes(i)&&action.zone!==i?'🔒':''}</button>`).join('')}</div><p class="muted">Il gioco prosegue allo scadere dei ${left} secondi.</p></div>`}
  case 'gavettone':return `<div class="resultpanel"><h2>💦 Dove ti sposti?</h2><p>Puoi cambiare zona fino alla scadenza o finché tutti hanno scelto.</p><div class="zones">${['🏖️ Spiaggia','⚓ Porto','🎤 Confessionale','🌲 Foresta'].map((z,i)=>`<button class="zone ${action.zone===i?'selected':''}" data-act="minipick" data-value="water_${i}">${z}</button>`).join('')}</div><p class="muted">Zona corrente: ${action.zone===undefined?'nessuna': ['Spiaggia','Porto','Confessionale','Foresta'][action.zone]} · ${left}s</p></div>`;
@@ -622,78 +621,136 @@ function startCoco(){const canvas=document.getElementById('cocoCanvas');if(!canv
  ctx.font='35px serif';for(let i=state.fall.length-1;i>=0;i--){const f=state.fall[i];f.y+=f.spd*dt;ctx.fillText(f.kind,f.x-17,f.y);if(f.y>H-56&&f.y<H-18&&Math.abs(f.x-state.x)<49){mini.cocoScore=Math.max(0,mini.cocoScore+(f.kind==='💀'?-3:f.kind==='🍉'?3:f.kind==='🍍'?5:1));state.fall.splice(i,1)}else if(f.y>H+40)state.fall.splice(i,1)}
  ctx.fillStyle='#a66b39';ctx.strokeStyle='#6d3c21';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(state.x-50,H-53);ctx.lineTo(state.x-39,H-20);ctx.lineTo(state.x+39,H-20);ctx.lineTo(state.x+50,H-53);ctx.closePath();ctx.fill();ctx.stroke();ctx.font='29px serif';ctx.fillText('🧺',state.x-21,H-21);let pointEl=document.getElementById('cocopoints');if(pointEl)pointEl.textContent=mini.cocoScore;if(t-mini.lastBoardUpdate>500){mini.lastBoardUpdate=t;paintLiveRankings()}mini.cocoFrame=requestAnimationFrame(frame)}frame()}
 function startRunner(){
- const canvas=document.getElementById('runnerCanvas');if(!canvas)return;
+ const canvas=document.getElementById('runnerCanvas');
+ if(!canvas||!session?.challenge||session.challenge.type!=='ostacoli')return;
  cancelAnimationFrame(mini.runnerFrame);
- const ctx=canvas.getContext('2d'),c=session.challenge;
- let state=mini.runner;
- if(!state){
-  state={progress:0,last:now(),jumpUntil:0,stumbleUntil:0,hazards:Array.from({length:13},(_,i)=>({at:8+i*6.8+rand(-1,1),kind:i%4,triggered:false})),finished:false,camera:0,assets:{}};
-  for(const id of c.players){const racer=playerBy(id);if(!racer)continue;const img=new Image();img.referrerPolicy='no-referrer';img.src=avatarImg(racer);state.assets[id]=img;}
-  mini.runner=state;
+ const ctx=canvas.getContext('2d'),challenge=session.challenge;
+ if(!ctx)return;
+ let r=mini.runner;
+ if(!r){
+  r={progress:0,speed:53,last:now(),jumpStart:-Infinity,jumpDuration:1010,stumbleUntil:0,hits:0,
+   hazards:Array.from({length:12},(_,i)=>({at:9+i*7.35+rand(-.55,.55),kind:i%4,triggered:false})),
+   finished:false,assets:{},lastLanes:0,lastSync:0};
+  for(const id of challenge.players){const player=playerBy(id);if(!player)continue;
+   const img=new Image();img.referrerPolicy='no-referrer';img.src=avatarImg(player);r.assets[id]=img;
+  }
+  mini.runner=r;
  }
- const jump=()=>{if(now()<c.startAt||state.finished||now()<state.jumpUntil-370)return;state.jumpUntil=now()+860};
- canvas.onpointerdown=jump;
- function drawImage(img,x,y,w,h){if(img?.complete&&img.naturalWidth)ctx.drawImage(img,x,y,w,h);}
+ // Pointer, touchscreen and keyboard all use exactly the same jump physics.
+ const jump=()=>{
+  const t=now();
+  if(t<challenge.startAt||r.finished||finishedMini()||t-r.jumpStart<r.jumpDuration*.91)return;
+  r.jumpStart=t;
+ };
+ r.jump=jump;
+ canvas.onpointerdown=e=>{e.preventDefault();jump()};
+ const jumpButton=document.getElementById('raceJump');
+ if(jumpButton){
+  jumpButton.onpointerdown=e=>{e.preventDefault();jump()};
+  jumpButton.onclick=e=>{if(!window.PointerEvent)jump()};
+ }
+ const W=canvas.width,H=canvas.height,heroX=215,heroY=307,finishX=965,trackX=155;
+ const jumpHeight=t=>{
+  const phase=(t-r.jumpStart)/r.jumpDuration;
+  return phase>0&&phase<1?Math.sin(Math.PI*phase)*72:0;
+ };
+ function portrait(img,x,y,radius,accent){
+  ctx.save();ctx.translate(x,y);
+  ctx.shadowColor='#70513255';ctx.shadowBlur=4;ctx.shadowOffsetY=2;
+  ctx.fillStyle='#fffae5';ctx.beginPath();ctx.arc(0,0,radius+3,0,Math.PI*2);ctx.fill();
+  ctx.shadowBlur=0;ctx.shadowOffsetY=0;ctx.strokeStyle=accent||'#ffa63a';ctx.lineWidth=3;
+  ctx.beginPath();ctx.arc(0,0,radius+1,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.arc(0,0,radius,0,Math.PI*2);ctx.clip();
+  if(img?.complete&&img.naturalWidth){
+   const scale=Math.max(radius*2/img.naturalWidth,radius*2/img.naturalHeight),w=img.naturalWidth*scale,h=img.naturalHeight*scale;
+   ctx.drawImage(img,-w/2,-h/2,w,h);
+  }else{ctx.fillStyle='#f7a84b';ctx.fillRect(-radius,-radius,radius*2,radius*2);
+   ctx.fillStyle='#fff';ctx.font=`900 ${radius}px Fredoka,Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('★',0,2)}
+  ctx.restore();
+ }
  function frame(){
-  if(!canvas.isConnected||session?.phase!=='challenge'||session.challenge?.type!=='ostacoli')return;
-  const t=now(),dt=Math.min(.045,Math.max(0,(t-state.last)/1000));state.last=t;
-  const elapsed=Math.max(0,(t-c.startAt)/1000),playing=t>=c.startAt;
-  if(playing&&!state.finished){
-   state.progress=Math.min(100,state.progress+dt*(t<state.stumbleUntil?0.82:2.55));
-   for(const hazard of state.hazards){if(hazard.triggered||state.progress<hazard.at)continue;hazard.triggered=true;
-    const jumping=t<state.jumpUntil&&t>state.jumpUntil-730;
-    if(!jumping){state.stumbleUntil=t+1000;state.progress=Math.max(0,state.progress-1.6);}
+  if(!canvas.isConnected||!session||session.phase!=='challenge'||session.challenge?.type!=='ostacoli')return;
+  const t=now(),dt=Math.min(.055,Math.max(0,(t-r.last)/1000));r.last=t;
+  const playing=t>=challenge.startAt,elapsed=Math.max(0,(t-challenge.startAt)/1000);
+  if(playing&&!r.finished&&!finishedMini()){
+   // Running steadily accelerates. Hitting an obstacle slows you, but never removes a life.
+   r.speed=Math.min(136,r.speed+dt*2.0);
+   const pace=(1.58+(r.speed-53)*.025)*(t<r.stumbleUntil?.43:1);
+   const previous=r.progress;
+   r.progress=Math.min(100,r.progress+dt*pace);
+   for(const obstacle of r.hazards){
+    if(obstacle.triggered||previous>=obstacle.at||r.progress<obstacle.at)continue;
+    obstacle.triggered=true;
+    if(jumpHeight(t)<28){
+     r.hits++;r.speed=Math.max(44,r.speed-13);r.stumbleUntil=t+650;
+     r.progress=Math.max(0,r.progress-.48);
+    }
    }
-   if(state.progress>=100){state.progress=100;state.finished=true;mini.runnerScore=100;
-    submitScore(Math.max(1,1200-Math.round(elapsed*14)),{progress:100,finishTime:Math.round(elapsed*1000)});
-    notify('🏁 Hai tagliato il traguardo! '+elapsed.toFixed(2)+' secondi.');
+   if(r.progress>=100){
+    r.progress=100;r.finished=true;
+    submitScore(Math.max(1,1000-Math.round(elapsed*10)),{progress:100,finishTime:Math.round(elapsed*1000),obstaclesHit:r.hits});
+    notify('🏁 Traguardo raggiunto in '+elapsed.toFixed(1)+' secondi!');
    }
   }
-  const W=canvas.width,H=canvas.height,world=4200,view=1100,playerX=270;
-  const playerWorld=state.progress/100*world;
-  state.camera+=(Math.max(0,Math.min(world-view,playerWorld-playerX))-state.camera)*Math.min(1,dt*7);
-  const worldX=x=>x-state.camera;
-  ctx.clearRect(0,0,W,H);
-  const sky=ctx.createLinearGradient(0,0,0,205);sky.addColorStop(0,'#75ccf0');sky.addColorStop(.65,'#c7eff8');sky.addColorStop(1,'#fef1c9');ctx.fillStyle=sky;ctx.fillRect(0,0,W,260);
-  ctx.fillStyle='#f0f9fb';for(let i=0;i<13;i++){const cloudX=((i*240-state.camera*.11)%1450+1450)%1450-100;ctx.beginPath();ctx.ellipse(cloudX,35+(i*37)%92,50,14,0,0,Math.PI*2);ctx.fill();}
-  ctx.fillStyle='#3ca6c3';ctx.fillRect(0,180,W,104);ctx.strokeStyle='#e8feff';ctx.lineWidth=4;for(let i=0;i<5;i++){ctx.beginPath();for(let x=0;x<W;x+=10){const y=206+i*14+Math.sin((x+state.camera*.26+i*27)/35)*3;if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke()}
-  const sand=ctx.createLinearGradient(0,272,0,H);sand.addColorStop(0,'#f8db96');sand.addColorStop(1,'#e3b773');ctx.fillStyle=sand;ctx.fillRect(0,270,W,H-270);
-  ctx.fillStyle='#ead19f';for(let i=0;i<32;i++){const x=worldX(i*158+75),y=311+i%4*24;if(x<-20||x>W+20)continue;ctx.beginPath();ctx.ellipse(x,y,24,3,.02,0,Math.PI*2);ctx.fill()}
-  // Repeating tropical decorations give the course a sense of movement and location.
-  for(let i=0;i<18;i++){
-   const x=worldX(i*260+80);if(x<-120||x>W+150)continue;
-   if(i%3===0){ctx.fillStyle='#8d724a';ctx.fillRect(x,151,13,110);ctx.fillStyle='#3fa16a';for(let k=0;k<5;k++){ctx.beginPath();ctx.ellipse(x+8+Math.cos(k*Math.PI*2/5)*39,151+Math.sin(k*Math.PI*2/5)*23,43,13,k*Math.PI/2.5,0,Math.PI*2);ctx.fill()}}
-   else if(i%3===1){ctx.font='35px serif';ctx.fillText('⛱️',x,264)}else{ctx.fillStyle='#cfb984';ctx.fillRect(x,260,35,7)}
+  // The entire course is one short, readable board, like the original screenshot.
+  const sky=ctx.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,'#a2e7f7');sky.addColorStop(.58,'#d3f5dc');sky.addColorStop(.61,'#f4deb0');sky.addColorStop(1,'#ecc285');
+  ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='#ffffff80';ctx.lineWidth=4;
+  for(let i=0;i<7;i++){ctx.beginPath();ctx.moveTo(0,23+i*25);ctx.lineTo(W,23+i*25);ctx.stroke()}
+  ctx.fillStyle='#ffffff64';ctx.fillRect(0,209,W,5);
+  ctx.fillStyle='#efc080';ctx.fillRect(0,230,W,125);
+  ctx.fillStyle='#e8b16f';ctx.fillRect(0,324,W,23);
+  ctx.strokeStyle='#fff1cc';ctx.lineWidth=4;ctx.setLineDash([30,23]);ctx.beginPath();ctx.moveTo(0,338);ctx.lineTo(W,338);ctx.stroke();ctx.setLineDash([]);
+  // Seven opponents stay above the large playable character, on their own slim tracks.
+  const others=challenge.players.filter(id=>id!==uid).slice(0,7);
+  others.forEach((id,i)=>{
+   const p=playerBy(id),action=challenge.actions?.[id],plan=challenge.botPlans?.[id];
+   const percent=challenge.scores?.[id]!==undefined?100:p?.human?clamp(Number(action?.progress)||0,0,100):
+    clamp((t-challenge.startAt)/Math.max(15000,plan?.duration||44000)*100,0,100);
+   const y=11+i*28,color=TEAMS[p?.team]?.color||'#e9a44d';
+   ctx.fillStyle=i%2?'#ffffff59':'#fff6d84d';ctx.fillRect(3,y,1018,26);
+   ctx.fillStyle='#513828';ctx.font='800 12px Nunito,Arial';ctx.textAlign='left';
+   ctx.fillText((p?.char||'NPC').slice(0,17),12,y+17);
+   ctx.fillStyle='#ffffffa6';ctx.fillRect(trackX,y+11,finishX-trackX,5);
+   ctx.fillStyle=color;ctx.fillRect(trackX,y+11,(finishX-trackX)*percent/100,5);
+   ctx.fillStyle='#855a2e';ctx.fillRect(finishX-2,y+5,2,19);
+   const x=trackX+(finishX-trackX)*percent/100;
+   portrait(r.assets[id],x,y+13,11,color);
+   ctx.font='800 11px Nunito,Arial';ctx.textAlign='right';ctx.fillStyle='#68452b';ctx.fillText(Math.round(percent)+'%',1014,y+18);
+  });
+  // Nearby obstacles move toward the runner; easy-to-see ground objects replace the old blurry circles.
+  const next=r.hazards.find(o=>!o.triggered);
+  for(const ob of r.hazards){
+   if(ob.triggered)continue;
+   const x=heroX+(ob.at-r.progress)*37;
+   if(x<heroX-65||x>W+75)continue;
+   ctx.save();ctx.translate(x,0);ctx.shadowColor='#77563656';ctx.shadowBlur=3;
+   if(ob.kind===0){ctx.fillStyle='#9f704d';ctx.fillRect(-23,300,46,34);ctx.fillStyle='#d39c5e';ctx.fillRect(-25,295,50,12);}
+   else if(ob.kind===1){ctx.fillStyle='#927c5d';ctx.beginPath();ctx.ellipse(0,321,23,15,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#c8b396';ctx.beginPath();ctx.ellipse(-6,317,14,7,0,0,Math.PI*2);ctx.fill()}
+   else if(ob.kind===2){ctx.fillStyle='#a76132';ctx.fillRect(-22,306,44,28);ctx.strokeStyle='#784623';ctx.lineWidth=4;ctx.strokeRect(-22,306,44,28);ctx.beginPath();ctx.moveTo(-20,308);ctx.lineTo(20,333);ctx.moveTo(20,308);ctx.lineTo(-20,333);ctx.stroke()}
+   else {ctx.fillStyle='#de7043';ctx.beginPath();ctx.ellipse(0,326,20,10,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#aa3f2a';ctx.lineWidth=4;for(let k=-2;k<=2;k++){ctx.beginPath();ctx.moveTo(k*7,326);ctx.lineTo(k*9,309);ctx.stroke()}}
+   ctx.restore();
+   if(next===ob&&ob.at-r.progress<3.7&&ob.at-r.progress>0){
+    ctx.fillStyle='#2a9d5e';ctx.font='900 16px Fredoka,Arial';ctx.textAlign='center';ctx.fillText('SALTA!',x,275);
+    ctx.textAlign='left';
+   }
   }
-  // Road and progress markers. Character is large and follows a long scrolling beach circuit.
-  ctx.fillStyle='#dfb67b';ctx.fillRect(0,326,W,86);ctx.fillStyle='#fff5d5';ctx.globalAlpha=.7;for(let i=0;i<18;i++){const x=worldX(i*230+35);ctx.fillRect(x,388,105,4)}ctx.globalAlpha=1;
-  for(const ob of state.hazards){const x=worldX(ob.at/100*world);if(x<-100||x>W+100)continue;
-   if(ob.kind===0){ctx.fillStyle='#8c6043';ctx.fillRect(x-25,336,50,31);ctx.fillStyle='#c99f65';ctx.fillRect(x-28,327,55,11);ctx.fillStyle='#fff1d1';ctx.font='13px Arial';ctx.fillText('✕',x-4,353)}
-   else if(ob.kind===1){ctx.fillStyle='#8c7248';ctx.beginPath();ctx.ellipse(x,369,28,15,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#c9b085';ctx.beginPath();ctx.ellipse(x-4,361,20,7,0,0,Math.PI*2);ctx.fill()}
-   else if(ob.kind===2){ctx.font='49px serif';ctx.fillText('🪵',x-22,370)}
-   else{ctx.font='40px serif';ctx.fillText('🦀',x-19,365)}
-  }
-  const finishX=worldX(world);if(finishX<W+100){ctx.fillStyle='#fff';ctx.fillRect(finishX,232,8,175);ctx.font='65px serif';ctx.fillText('🏁',finishX-12,238);}
-  // Hero portrait intentionally much bigger than every opponent avatar.
-  const heroImg=state.assets[uid],jumping=t<state.jumpUntil&&t>state.jumpUntil-730;
-  const jPhase=jumping?(state.jumpUntil-t)/860:0,hop=jumping?Math.max(0,Math.sin(jPhase*Math.PI))*100:0;
-  const x=worldX(playerWorld),y=322-hop;
-  ctx.save();ctx.translate(x,y);ctx.rotate(playing&&!state.finished?(elapsed*4.4%(Math.PI*2)):-.04);
-  ctx.shadowColor='#4b4a332c';ctx.shadowBlur=18;ctx.shadowOffsetY=9;ctx.fillStyle='#fffaf5';ctx.beginPath();ctx.arc(0,0,65,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
-  ctx.strokeStyle=t<state.stumbleUntil?'#ed6650':'#ffb52c';ctx.lineWidth=9;ctx.stroke();ctx.save();ctx.beginPath();ctx.arc(0,0,57,0,Math.PI*2);ctx.clip();if(heroImg?.complete&&heroImg.naturalWidth)drawImage(heroImg,-58,-58,116,116);else{ctx.fillStyle='#fa8a4e';ctx.font='bold 64px Arial';ctx.fillText('★',-31,25)}ctx.restore();ctx.restore();
-  ctx.font='900 19px Fredoka,Arial';ctx.fillStyle='#61402c';ctx.fillText('TU',Math.max(0,x-17),y-84);
-  if(t<state.stumbleUntil){ctx.font='900 23px Fredoka,Arial';ctx.fillStyle='#c34e2a';ctx.fillText('OPS! RALLENTI!',Math.min(W-250,x+70),y-92)}
-  ctx.fillStyle='#fffaf0df';ctx.fillRect(12,12,W-24,27);ctx.fillStyle='#ec9251';ctx.fillRect(18,18,(W-36)*state.progress/100,14);
-  ctx.font='900 16px Fredoka,Arial';ctx.fillStyle='#573a2c';ctx.fillText('PARTENZA',15,63);ctx.fillText('ARRIVO 🏁',W-125,63);
-  const score=document.getElementById('runnerScore');if(score)score.textContent=Math.round(state.progress)+'%';
-  // Update the seven smaller lanes without rebuilding or resetting the page.
-  if(!state.lastLanes||t-state.lastLanes>120){state.lastLanes=t;document.querySelectorAll('.race-small-lane').forEach(row=>{
-   const id=row.dataset.racer,plan=c.botPlans?.[id],finish=c.scores[id]!==undefined;
-   const percent=finish?100:clamp(Math.round(elapsed*100/(plan?.duration/1000||43)),0,100);
-   const progress=row.querySelector('.race-small-progress'),avatar=row.querySelector('.race-small-runner'),value=row.querySelector('.race-small-percent');
-   if(progress)progress.style.width=percent+'%';if(avatar)avatar.style.left=`${clamp(percent,0,96)}%`;if(value)value.textContent=percent+'%';
-  });}
-  if(t-mini.lastBoardUpdate>500){mini.lastBoardUpdate=t;paintLiveRankings()}
+  // Actual arc is calculated with the same physics used to check obstacle collisions.
+  const hop=jumpHeight(t),hero=playerBy(uid),teamColor=TEAMS[hero?.team]?.color||'#ff9f37';
+  ctx.fillStyle='#8f674a32';ctx.beginPath();ctx.ellipse(heroX,339,40*Math.max(.5,1-hop/180),8,0,0,Math.PI*2);ctx.fill();
+  ctx.save();ctx.translate(heroX,heroY-hop);ctx.rotate(playing&&!r.finished?elapsed*(2.5+r.speed/62):0);
+  portrait(r.assets[uid],0,0,38,teamColor);ctx.restore();
+  ctx.fillStyle='#734122';ctx.font='900 14px Fredoka,Arial';ctx.textAlign='center';ctx.fillText('TU',heroX,Math.min(245,heroY-hop-49));ctx.textAlign='left';
+  if(t<r.stumbleUntil){ctx.fillStyle='#cd3b22';ctx.font='900 15px Fredoka,Arial';ctx.fillText('OSTACOLO! RALLENTI',heroX+60,270)}
+  if(r.progress>=97){ctx.font='36px serif';ctx.fillText('🏁',W-85,312)}
+  const near=next?Math.max(0,next.at-r.progress):Infinity;
+  const alert=document.getElementById('raceAlert');
+  if(alert)alert.textContent=r.finished?'🏁 ARRIVATO!':near<3.7?'🟢 SALTA ORA!':`Prossimo ostacolo fra ${Math.round(near*30)} m`;
+  const speed=document.getElementById('raceSpeed');if(speed)speed.textContent=Math.round(r.speed)+' km/h';
+  const distance=document.getElementById('raceDistance');if(distance)distance.textContent=`${Math.round(r.progress*30)} / 3000 m`;
+  const score=document.getElementById('runnerScore');if(score)score.textContent=Math.round(r.progress)+'%';
+  if(t-mini.lastBoardUpdate>650){mini.lastBoardUpdate=t;paintLiveRankings()}
   mini.runnerFrame=requestAnimationFrame(frame);
  }
  frame();
@@ -880,7 +937,18 @@ app.addEventListener('dragover',e=>{if(session?.challenge?.type==='puzzle'&&(e.t
 app.addEventListener('drop',e=>{if(session?.challenge?.type!=='puzzle')return;const data=e.dataTransfer.getData('text/plain'),[kind,val]=data.split(':');if(!['puzzlepiece','puzzlecell'].includes(kind))return;e.preventDefault();mini.puzzleSuppressClick=now()+350;puzzleMove(kind,val,e.target)});
 app.addEventListener('click',e=>{let el=e.target.closest('[data-act]');if(!el||el.disabled)return;if(['puzzlepiece','puzzlecell'].includes(el.dataset.act)&&now()<(mini.puzzleSuppressClick||0))return;handleClick(el.dataset.act,el).catch(ex=>{console.error(ex);notify('Errore: '+ex.message)})});
 app.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='chattext'){e.preventDefault();sendChat()}if(e.key==='Enter'&&e.target.id==='joincode'){e.preventDefault();joinRoom(e.target.value)}});
-window.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal){modal='';render();return}if(e.code==='Space'&&!['INPUT','TEXTAREA','BUTTON','SELECT'].includes(document.activeElement?.tagName||'')&&session?.phase==='challenge'&&mine()?.alive&&!finishedMini()){if(session.challenge.type==='ostacoli'){e.preventDefault();let r=mini.runner;if(r&&!r.finished&&now()>=session.challenge.startAt)r.jumpUntil=now()+780}else if(session.challenge.type==='ponte'){e.preventDefault();handleClick('stoprope',{})}}});
+window.addEventListener('keydown',e=>{
+ if(e.key==='Escape'&&modal){modal='';render();return}
+ if(session?.phase!=='challenge'||!mine()?.alive||finishedMini())return;
+ const typing=['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName||'');
+ if(session.challenge.type==='ostacoli'&&!typing&&['Space','ArrowUp','KeyW'].includes(e.code)){
+  e.preventDefault();if(!e.repeat)mini.runner?.jump?.();return;
+ }
+ if(e.code==='Space'&&!typing&&session.challenge.type==='ponte'){
+  e.preventDefault();handleClick('stoprope',{});
+ }
+});
+
 window.addEventListener('storage',e=>{if(mode==='demo'&&session&&e.key===DEMOKEY+':'+activeCode&&e.newValue){try{session=JSON.parse(e.newValue);render()}catch{}}});
 setInterval(tick,250);
 render();startFirebase().then(async()=>{if(serverReady){let last=localStorage.getItem('dinguz_active');if(last&&screen==='home'){try{let d=await db.collection('dinguz_rooms').doc(last).get();if(d.exists&&d.data().players.some(p=>p.id===uid)){mode='online';session=d.data();subscribe(last)}}catch{}}}else{let last=localStorage.getItem('dinguz_active');if(last&&localStorage.getItem(DEMOKEY+':'+last)){mode='demo';session=JSON.parse(localStorage.getItem(DEMOKEY+':'+last));subscribe(last)}}});

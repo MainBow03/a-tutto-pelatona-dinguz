@@ -731,7 +731,7 @@ function startRunner(){
    else if(ob.kind===2){ctx.fillStyle='#a76132';ctx.fillRect(-22,306,44,28);ctx.strokeStyle='#784623';ctx.lineWidth=4;ctx.strokeRect(-22,306,44,28);ctx.beginPath();ctx.moveTo(-20,308);ctx.lineTo(20,333);ctx.moveTo(20,308);ctx.lineTo(-20,333);ctx.stroke()}
    else {ctx.fillStyle='#de7043';ctx.beginPath();ctx.ellipse(0,326,20,10,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#aa3f2a';ctx.lineWidth=4;for(let k=-2;k<=2;k++){ctx.beginPath();ctx.moveTo(k*7,326);ctx.lineTo(k*9,309);ctx.stroke()}}
    ctx.restore();
-   if(next===ob&&ob.at-r.progress<3.7&&ob.at-r.progress>0){
+   if(next===ob&&ob.at-r.progress<(1.58+(r.speed-53)*.025)*.80&&ob.at-r.progress>0){
     ctx.fillStyle='#2a9d5e';ctx.font='900 16px Fredoka,Arial';ctx.textAlign='center';ctx.fillText('SALTA!',x,275);
     ctx.textAlign='left';
    }
@@ -746,7 +746,7 @@ function startRunner(){
   if(r.progress>=97){ctx.font='36px serif';ctx.fillText('🏁',W-85,312)}
   const near=next?Math.max(0,next.at-r.progress):Infinity;
   const alert=document.getElementById('raceAlert');
-  if(alert)alert.textContent=r.finished?'🏁 ARRIVATO!':near<3.7?'🟢 SALTA ORA!':`Prossimo ostacolo fra ${Math.round(near*30)} m`;
+  if(alert)alert.textContent=r.finished?'🏁 ARRIVATO!':!next?'🏁 Rettilineo finale!':near<(1.58+(r.speed-53)*.025)*.80?'🟢 SALTA ORA!':`Prossimo ostacolo fra ${Math.round(near*30)} m`;
   const speed=document.getElementById('raceSpeed');if(speed)speed.textContent=Math.round(r.speed)+' km/h';
   const distance=document.getElementById('raceDistance');if(distance)distance.textContent=`${Math.round(r.progress*30)} / 3000 m`;
   const score=document.getElementById('runnerScore');if(score)score.textContent=Math.round(r.progress)+'%';
